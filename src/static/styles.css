@@ -38,13 +38,13 @@ body.dark-mode {
   --primary: #7986cb;
   --primary-light: #aab6fe;
   --primary-dark: #49599a;
-  --primary-text: #000000;
+  --primary-text: #ffffff;
 
   /* Secondary colors */
   --secondary: #ff9800;
   --secondary-light: #ffc947;
   --secondary-dark: #c66900;
-  --secondary-text: #000000;
+  --secondary-text: #ffffff;
 
   /* Neutral colors - inverted for dark mode */
   --background: #121212;
