@@ -44,6 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Authentication state
   let currentUser = null;
 
+  // Configuration
+  const SCHOOL_NAME = "Mergington High School";
+
   // Time range mappings for the dropdown
   const timeRanges = {
     morning: { start: "06:00", end: "08:00" }, // Before school hours
@@ -478,17 +481,48 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${baseUrl}#activity=${encodeURIComponent(activityName)}`;
   }
 
+  // Function to copy text to clipboard with fallback for older browsers
+  function copyToClipboard(text) {
+    // Try modern Clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    } else {
+      // Fallback for older browsers or non-secure contexts
+      return new Promise((resolve, reject) => {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          if (successful) {
+            resolve();
+          } else {
+            reject(new Error('Copy command failed'));
+          }
+        } catch (err) {
+          document.body.removeChild(textArea);
+          reject(err);
+        }
+      });
+    }
+  }
+
   // Function to share activity on social media or copy link
   function shareActivity(platform, activityName, activityDescription) {
     const shareUrl = generateShareUrl(activityName);
-    const shareText = `Check out ${activityName} at Mergington High School! ${activityDescription}`;
+    const shareText = `Check out ${activityName} at ${SCHOOL_NAME}! ${activityDescription}`;
     
     switch(platform) {
       case 'facebook':
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=400');
         break;
       case 'twitter':
-        const twitterText = `Check out ${activityName} at Mergington High School!`;
+        const twitterText = `Check out ${activityName} at ${SCHOOL_NAME}!`;
         window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=400');
         break;
       case 'email':
@@ -497,7 +531,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
         break;
       case 'copy':
-        navigator.clipboard.writeText(shareUrl).then(() => {
+        copyToClipboard(shareUrl).then(() => {
           showMessage('Link copied to clipboard!', 'success');
         }).catch(() => {
           showMessage('Failed to copy link', 'error');
